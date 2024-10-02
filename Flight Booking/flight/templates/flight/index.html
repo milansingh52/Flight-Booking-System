@@ -1,0 +1,494 @@
+{% extends 'flight/layout.html' %}
+
+{% load static %}
+
+{% block head %}
+    <title>Home | Flight</title>
+    <script type="text/javascript" src="{% static 'js/index1.js' %}"></script>
+
+    <!--calendar style-->
+    <style>          
+        .calendar {
+            position:absolute;
+            top:0;
+            margin-left: 675px;
+            width: 600px;
+            background-color: #fff;
+            box-shadow: 0px 0px 15px 3px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .month {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            color: #000000;
+            padding: 0px 30px;
+        }
+
+        .weekends {
+            display: flex;
+            background-color: #ff6d38;
+            padding: 7px 0;
+            color: #fff;
+        }
+
+        .weekends div {
+            width: 14.28%;
+            text-align: center;
+        }
+
+        .days {
+            display: flex;
+            flex-wrap: wrap;
+            text-align: center;
+            font-weight: 300;
+            padding: 10px 0;
+        }
+
+        .days div {
+            width: 14.28%;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            padding: 5px 0;
+            transition: all 0.4s;
+        }
+
+        .days div:hover {
+            background-color: #dfe6e9;
+            cursor: pointer;
+        }
+
+        .today {
+            /*background-color: black;
+            color: #fff;*/
+        }
+
+        .today:hover {
+            background-color: #27ae60 !important;
+            color: #fff;
+        }
+
+        .prev_date {
+            color: #bcbaba;
+        }
+
+        #month {
+            font-size: 30px;
+            font-weight: 500;
+            color: black;
+        }
+
+        .prev,
+        .next {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            transition: all 0.4s;
+            cursor: pointer;
+        }
+
+        .prev:hover,
+        .next:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+{% endblock head %}
+
+{% block body %}
+    <!-- First Section -->
+    {% comment %} <section class="section first-section" style="background-image: linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.2)), url('{% static 'img/plane3.12.jpg'%}');"> {% endcomment %}
+    <div class="banner-img" style="background-image: url('{% static 'img/nav.png'%}');"></div>
+    <section class="section first-section banner-content">
+        <h2>Book Domestic and International Flight Tickets</h2>
+        <!-- <div class="banner-div">
+            <div class="banner">
+                <h1 class="banner-text">Book Domestic and International Flight Tickets</h1>
+            </div>
+        </div> -->
+        
+        <div class="search-flight">
+            <div class="container">
+                <form class="search-flight-form" id="myForm" action="" onsubmit="return flight_search()">  <!--{% url 'flight' %}-->
+                    <div class="align-items-center">
+                        <div class="search-flight-form-data">
+                            <div class="input-row" style="display: flex;">
+                                <div class="form-check-inline">
+                                    <label class="form-check-label">
+                                    <input type="radio" class="form-check-input trip-type" id="one-way" name="TripType" value="1" checked>One-way
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="form-check-label">
+                                    <input type="radio" class="form-check-input trip-type" id="round-trip" name="TripType" value="2" {% if trip_type == '2' %}checked{% endif %}>Round Trip
+                                    </label>
+                                </div>
+                                {% comment %} <div class="input-row">
+                                    <label for="seat_class">Class: </label>
+                                    <select name="SeatClass" id="SeatType" class="selectpicker" style="width:100px; height:30px; color:gray;" >
+                                        <option value="economy" {% if seat == 'economy' %}selected{% endif %}>Economy</option>
+                                        <option value="business" {% if seat == 'business' %}selected{% endif %}>Business</option>
+                                        <option value="first" {% if seat == 'first' %}selected{% endif %}>First</option>
+                                    </select>
+                                </div> {% endcomment %}
+
+                                <div class="input-row">
+                                    <label for="seat_class">Airline: </label>
+                                    <select name="airline" id="" class="selectpicker" style="width:100px; height:30px; color:gray; border:none;">
+                                        <option value="Buddha_Air" {% if airline == 'Buddha_Air' %}selected{% endif %}>Buddha Air</option>
+                                        <option value="Summit_Air" {% if airline == 'Summit_Air' %}selected{% endif %}>Summit Air</option>
+                                        <option value="Shree_Airlines" {% if airline == 'Shree_Airlines' %}selected{% endif %}>Shree Airlines</option>
+                                        <option value="Yeti_Airlines" {% if airline == 'Yeti_Airlines' %}selected{% endif %}>Yeti Airlines</option>
+                                        <option value="Tara_Air" {% if airline == 'Tara_Air' %}selected{% endif %}>Tara Air</option>
+                                    </select>
+                                </div>
+                                
+
+                                <div class="input-row">
+                                    <label for="seat_class">Stops: </label>
+                                    <select name="stops" id="" class="selectpicker" style="width:100px; height:30px; color:gray; border:none;">
+                                        <option value="zero" {% if stops == 0 %}selected{% endif %}>zero stop</option>
+                                        <option value="one" {% if stops == 1 %}selected{% endif %}>one stop</option>
+                                        <option value="two_or_more" {% if stops == 2 %}selected{% endif %}>two or more stop</option>
+                                    </select>
+                                </div>                               
+                                
+
+                                <div class="input-row">
+                                    <label for="seat_class">Dept Time: </label>
+                                    <select name="dept_time" id="" class="selectpicker" style="width:100px; height:30px; color:gray; border:none;">
+                                        <option value="morning" {% if dept_time == 'morning' %}selected{% endif %}>Morning</option>
+                                        <option value="early morning" {% if dept_time == 'early morning' %}selected{% endif %}>Early Morning</option>
+                                        <option value="afternoon" {% if dept_time == 'afternoon' %}selected{% endif %}>Afternoon</option>
+                                        <option value="evening" {% if dept_time == 'evening' %}selected{% endif %}>Evening</option>
+                                        <option value="night" {% if dept_time == 'night' %}selected{% endif %}>Night</option>
+                                        <option value="late night" {% if dept_time == 'late night' %}selected{% endif %}>Late Night</option>
+                                    </select>
+                                </div>
+                                <div class="input-row">
+                                    <label for="seat_class">Arrival Time: </label>
+                                    <select name="arr_time" id="" class="selectpicker" style="width:100px; height:30px; color:gray; border:none; border:none;">
+                                        <option value="morning" {% if arr_time == 'morning' %}selected{% endif %}>Morning</option>
+                                        <option value="early morning" {% if arr_time == 'early morning' %}selected{% endif %}>Early Morning</option>
+                                        <option value="afternoon" {% if arr_time == 'afternoon' %}selected{% endif %}>Afternoon</option>
+                                        <option value="evening" {% if arr_time == 'evening' %}selected{% endif %}>Evening</option>
+                                        <option value="night" {% if arr_time == 'night' %}selected{% endif %}>Night</option>
+                                        <option value="late night" {% if arr_time == 'late night' %}selected{% endif %}>Late Night</option>
+                                    </select>
+                                </div>
+                                
+                            </div>
+    
+                            <div class="input-row" style="display:flex; justify-content: space-between;">
+                                <!--From-->
+                                <div class="input-row">
+                                    <label for="flight-from">From: </label>
+                                    <input type="text" name="Origin" placeholder="From" id="flight-from" class="form-control form-control-lg mr-sm-3" onblur="hideplaces(this)" data-value="{{origin | lower}}" data-list="places_from" autocomplete="off" value="{{origin | upper}}">  <!--list="places_from"-->
+                                    <div id="places_from" class="places_box">
+                                        <div class="each_places_from_list places__list" data-value="ktm" onclick="selectplace(this)">Kathmandu (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="bwa" onclick="selectplace(this)">Bhairahawa (Nepal)</div>                                       
+                                        <div class="each_places_from_list places__list" data-value="pkr" onclick="selectplace(this)">Pokhara (Nepal)</div>                                       
+                                        <div class="each_places_from_list places__list" data-value="brt" onclick="selectplace(this)">Biratnagar (Nepal)</div>                                       
+                                        <div class="each_places_from_list places__list" data-value="npj" onclick="selectplace(this)">Nepalgunj (Nepal)</div>                                       
+                                        <div class="each_places_from_list places__list" data-value="jnk" onclick="selectplace(this)">Janakpur (Nepal)</div>                                       
+                                        <div class="each_places_from_list places__list" data-value="bkk" onclick="selectplace(this)">Bangkok (Thailand)</div>
+                                        <div class="each_places_from_list places__list" data-value="nrt" onclick="selectplace(this)">Tokyo (Japan)</div>
+                                        <div class="each_places_from_list places__list" data-value="sin" onclick="selectplace(this)">Singapore (Singapore)</div>
+                                        <div class="each_places_from_list places__list" data-value="tpe" onclick="selectplace(this)">Taipei (Taiwan)</div>
+                                        <div class="each_places_from_list places__list" data-value="nyc" onclick="selectplace(this)">New York (USA)</div>
+                                        <div class="each_places_from_list places__list" data-value="del" onclick="selectplace(this)">Delhi (India)</div>
+                                        <div class="each_places_from_list places__list" data-value="bom" onclick="selectplace(this)">Mumbai (India)</div>
+                                    </div>
+                                </div>
+        
+                                <!--To-->
+                                <div class="input-row">
+                                    <label for="flight_to">To: </label>
+                                    <input type="text" name="Destination" placeholder="To" id="flight-to" class="form-control form-control-lg mr-sm-3" onblur="hideplaces(this)" data-value="{{destination | lower}}" data-list="places_to" autocomplete="off" value="{{destination | upper}}">
+                                    <div id="places_to" class="places_box">
+                                        <div class="each_places_from_list places__list" data-value="bwa" onclick="selectplace(this)">Bhairahawa (Nepal)</div> 
+                                        <div class="each_places_from_list places__list" data-value="ktm" onclick="selectplace(this)">Kathmandu (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="pkr" onclick="selectplace(this)">Pokhara (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="brt" onclick="selectplace(this)">Biratnagar (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="npj" onclick="selectplace(this)">Nepalgunj (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="jnk" onclick="selectplace(this)">Janakpur (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="jum" onclick="selectplace(this)">Jumla (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="lum" onclick="selectplace(this)">Lumbini (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="mak" onclick="selectplace(this)">Makanpur (Nepal)</div>
+                                        <div class="each_places_from_list places__list" data-value="tul" onclick="selectplace(this)">Tulsipur (Nepal)</div>
+                                        
+                                        <div class="each_places_to_list places__list" data-value="bkk" onclick="selectplace(this)">Bangkok (Thailand)</div>
+                                        <div class="each_places_to_list places__list" data-value="nrt" onclick="selectplace(this)">Tokyo (Japan)</div>
+                                        <div class="each_places_to_list places__list" data-value="sin" onclick="selectplace(this)">Singapore (Singapore)</div>
+                                        <div class="each_places_to_list places__list" data-value="tpe" onclick="selectplace(this)">Taipei (Taiwan)</div>
+                                        <div class="each_places_to_list places__list" data-value="nyc" onclick="selectplace(this)">New York (USA)</div>
+                                        <div class="each_places_to_list places__list" data-value="del" onclick="selectplace(this)">Delhi (India)</div>
+                                        <div class="each_places_to_list places__list" data-value="bom" onclick="selectplace(this)">Mumbai (India)</div>
+                                    </div>
+                                </div>
+
+                                <div class="input-row">
+                                    <label for="seat_class">Class: </label>
+                                    <select name="SeatClass" id="SeatType" class="selectpicker" style="width:100px; height:47px; color:gray; border: 1px solid #d2cdcd; border-radius:5px; " >
+                                        <option value="">Select</option>
+                                        <option value="economy" {% if seat == 0 %}selected{% endif %}>Economy</option>
+                                        <option value="business" {% if seat == 1 %}selected{% endif %}>Business</option>
+                                        <option value="first" {% if seat == 2 %}selected{% endif %}>First</option>
+                                    </select>
+                                </div>
+        
+                                <div class="input-row" style="width:240px">
+                                    <label for="depart_date">Departure Date: </label>
+                                    {% comment %} <input type="date" name="DepartDate" min="{{min_date}}" max="{{max_date}}" id="depart_date" placeholder="Date" class="form-control form-control-lg mr-sm-2" value="{{depart_date}}">                                {% endcomment %}
+                                    <input type="text" id="date-input" name="DepartDate" placeholder="mm/dd/yyyy" onclick="renderDate()" class="form-control form-control-lg mr-sm-2" value="{{depart_date}}" >
+                                </div>
+        
+                                <div class="input-row" style="width:240px">
+                                    <label for="return_date">Return Date: </label>
+                                    <input type="date" name="ReturnDate" min="{{min_date}}" max="{{max_date}}" id="return_date" placeholder="Date" class="form-control form-control-lg mr-sm-2" value="{{return_date}}" {% if trip_type != '2' %} disabled {% endif %}>
+                                </div>
+                            </div>
+                            
+                            <div class="form-btn">
+                                <button type="submit" class="search-btn" id="searchButton">SEARCH FLIGHTS</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!--Calendar-->
+                <div class="calendar">
+                    <div class="month">
+                        <div class="prev" onclick="moveDate('prev')">
+                            <span>&#10094;</span>
+                        </div>
+                        <div>
+                            <h2 id="month"></h2>
+                            <p id="date_str"></p>
+                        </div>
+                        <div class="next" onclick="moveDate('next')">
+                            <span>&#10095;</span>
+                        </div>
+                    </div>
+                    <div class="weekends">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    <div class="days"></div>
+                </div>
+
+                {% comment %} {% for p in predictions %}
+                <p>{{p}}</p>
+                {% endfor %} {% endcomment %}
+
+                
+
+            </div>
+        </div>
+    </section>
+    
+
+    <!-- Second Section -->
+    <section class="section second-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="section_title text-center mb_70">
+                        <h2>Popular Destination</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row popular_destinations">
+                <div class="col-lg-4 col-md-6">
+                    <div class="single_destination" onclick="window.location.href = 'https://en.wikipedia.org/wiki/Tourism_in_Italy'">
+                        <div class="thumb">
+                            <img src="{% static 'img/destination/1.png' %}" alt="">
+                        </div>
+                        <div class="content">
+                            <a href="#">Italy</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="single_destination" onclick="window.location.href = 'https://en.wikipedia.org/wiki/Tourism_in_Brazil'">
+                        <div class="thumb">
+                            <img src="{% static 'img/destination/2.png' %}" alt="">
+                        </div>
+                        <div class="content">
+                            <a href="#">Brazil</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="single_destination" onclick="window.location.href = 'https://en.wikipedia.org/wiki/Tourism_in_the_United_States'">
+                        <div class="thumb">
+                            <img src="{% static 'img/destination/3.png' %}" alt="">
+                        </div>
+                        <div class="content">
+                            <a href="#">America</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="single_destination" onclick="window.location.href = 'https://en.wikipedia.org/wiki/Tourism_in_Nepal'">
+                        <div class="thumb">
+                            <img src="{% static 'img/destination/4.png' %}" alt="">
+                        </div>
+                        <div class="content">
+                            <a href="#">Nepal</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="single_destination" onclick="window.location.href = 'https://en.wikipedia.org/wiki/Tourism_in_the_Maldives'">
+                        <div class="thumb">
+                            <img src="{% static 'img/destination/5.png' %}" alt="">
+                        </div>
+                        <div class="content">
+                            <a href="#">Maldives</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="single_destination" onclick="window.location.href = 'https://en.wikipedia.org/wiki/Tourism_in_Indonesia'">
+                        <div class="thumb">
+                            <img src="{% static 'img/destination/6.png' %}" alt="">
+                        </div>
+                        <div class="content">
+                            <a href="#">Indonesia</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- For Prediction -->
+    <script>
+        var predictions = [
+            {% for p in predictions %}
+                "{{p}}",
+            {% endfor %}
+        ];
+    </script>
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+                       
+            var inputField = document.getElementById('SeatType');           
+            var form = document.getElementById('myForm');
+            var searchButton = document.getElementById('searchButton');
+
+            inputField.addEventListener('change', function () {
+                if (this.value) {                    
+                    //alert(this.value)
+                    form.action = '{% url "predict" %}'; // Django URL for "aboutus"
+                    form.submit();
+                }
+            });
+        
+            searchButton.addEventListener('click', function (event) {
+                form.action = '{% url "flight" %}';
+                form.submit();
+            });
+        });
+    </script>
+
+    <!--calendar script-->
+    <script>
+        var dt = new Date();
+
+        // Show the calendar when the input field is clicked
+        function renderDate() {
+            document.getElementsByClassName("calendar")[0].style.display = 'block';
+            dt.setDate(1);
+            var day = dt.getDay();
+            var endDate = new Date(dt.getFullYear(), dt.getMonth() + 1, 0).getDate();
+            var prevEndDate = new Date(dt.getFullYear(), dt.getMonth(), 0).getDate();
+            var today = new Date();
+    
+            var months = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+    
+            document.getElementById("date_str").innerHTML = dt.toDateString();
+            document.getElementById("month").innerHTML = months[dt.getMonth()];
+    
+            var cells = "";
+    
+            // For previous month's dates
+            for (x = day; x > 0; x--) {
+                cells += "<div class='prev_date'>" + (prevEndDate - x + 1) + " </div>";
+            }
+    
+            // Prediction values
+            var predictions = {{ predictions|safe }};
+            var predictionIndex = 0;
+    
+            // For current month's dates
+            for (i = 1; i <= endDate; i++) {
+                var dateClass = "";
+                var predictionText = "";
+    
+                if (i >= today.getDate() && dt.getMonth() == today.getMonth()) {
+                    // Assign prediction values only from today onwards
+                    if (predictionIndex < predictions.length) {
+                        predictionText = "<p>" + predictions[predictionIndex] + "</p>";
+                        predictionIndex++;
+                    }
+                }
+    
+                if (i == today.getDate() && dt.getMonth() == today.getMonth()) {
+                    dateClass = "today";
+                }
+    
+                cells += "<div class='" + dateClass + "' onclick='selectDate(" + i + ")'>" + i + predictionText + "</div>";
+            }
+    
+            document.getElementsByClassName("days")[0].innerHTML = cells;
+        }
+    
+        // Hide the calendar when clicking outside of it
+        document.addEventListener('click', function (event) {
+            var calendar = document.getElementsByClassName('calendar')[0];
+            var input = document.getElementById('date-input');
+    
+            if (!calendar.contains(event.target) && event.target !== input) {
+                calendar.style.display = 'none';
+            }
+        });
+    
+        function moveDate(para) {
+            if (para == 'prev') {
+                dt.setMonth(dt.getMonth() - 1);
+            } else if (para == 'next') {
+                dt.setMonth(dt.getMonth() + 1);
+            }
+            renderDate();
+        }
+    
+        function selectDate(day) {
+            var selectedDate = new Date(dt.getFullYear(), dt.getMonth(), day);
+            var year = selectedDate.getFullYear();
+            var month = ('0' + (selectedDate.getMonth() + 1)).slice(-2); // Ensures two-digit month
+            var date = ('0' + selectedDate.getDate()).slice(-2); // Ensures two-digit date
+    
+            var formattedDate = `${month}/${date}/${year}`;
+            document.getElementById("date-input").value = formattedDate;
+            document.getElementsByClassName("calendar")[0].style.display = 'none';
+        }
+
+    </script>
+{% endblock%}
